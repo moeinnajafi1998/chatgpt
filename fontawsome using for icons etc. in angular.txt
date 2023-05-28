@@ -1,0 +1,25 @@
++++installation:
+$ npm install @fortawesome/fontawesome-svg-core
+$ npm install @fortawesome/free-solid-svg-icons
+
++++Add FontAwesomeModule to imports in src/app/app.module.ts:
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+  imports: [
+    BrowserModule,
+    FontAwesomeModule
+  ]
+
++++Tie the icon to the property in your component src/app/app.component.ts:
+import { Component } from '@angular/core';
+import { faCoffee } from '@fortawesome/free-solid-svg-icons';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+})
+export class AppComponent {
+  faCoffee = faCoffee;
+}
+
++++Use the icon in the template src/app/app.component.html:
+<fa-icon [icon]="faCoffee"></fa-icon>
