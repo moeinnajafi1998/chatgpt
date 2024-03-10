@@ -1,0 +1,96 @@
+question: 
+I have lots of http request in my angular app with backend ip as hardcode
+when I build project I  cant change this ip 
+how to convert it as changeable ip
+
+
+
+answer:
+To make the backend IP address configurable in your Angular app so that you can change it easily without rebuilding the project, you can follow these steps:
+
+Create a Configuration File: Start by creating a configuration file where you can store the backend IP address.
+
+Use Angular Environment Variables: Angular allows you to define environment-specific configuration files. You can use these to specify different backend IP addresses for different environments (e.g., development, production).
+
+Inject the Configuration: Inject the configuration into your Angular services or components so that they can use the configured IP address to make HTTP requests.
+
+Here's a step-by-step guide:
+
+Step 1: Create a Configuration File
+Create a file named environment.ts in your src/environments directory if it doesn't exist already. This file contains the configuration for your development environment.
+
+typescript
+Copy code
+// src/environments/environment.ts
+
+export const environment = {
+  production: false,
+  apiUrl: 'http://your-backend-ip-address:port'
+};
+For production, create a file named environment.prod.ts in the same directory:
+
+typescript
+Copy code
+// src/environments/environment.prod.ts
+
+export const environment = {
+  production: true,
+  apiUrl: 'http://your-backend-ip-address:port'
+};
+Replace 'http://your-backend-ip-address:port' with the actual IP address and port of your backend server.
+
+Step 2: Inject the Configuration
+Inject the configuration in your Angular services or components where you make HTTP requests.
+
+typescript
+Copy code
+// example.service.ts
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExampleService {
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
+
+  getData() {
+    return this.http.get(`${this.apiUrl}/api/data`);
+  }
+}
+Step 3: Use the Configuration
+Use the configured IP address in your HTTP requests throughout your Angular app. By utilizing the environment object, Angular will automatically select the appropriate IP address based on the environment.
+
+Step 4: Change IP Address
+Now, whenever you need to change the backend IP address, you can simply modify the environment.ts or environment.prod.ts file without rebuilding the project.
+
+Note:
+Remember to import HttpClientModule in your Angular module and provide any necessary services.
+
+typescript
+Copy code
+// app.module.ts
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+By following these steps, you can easily manage and change the backend IP address in your Angular app without rebuilding it every time.
