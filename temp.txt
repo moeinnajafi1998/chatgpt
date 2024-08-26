@@ -1,1 +1,56 @@
 
+drawWaveform(index: number, playheadPosition: number = 0): void {
+  const canvas = this.waveCanvases.toArray()[index].nativeElement;
+  const canvasCtx = canvas.getContext('2d')!;
+  const { width, height } = canvas;
+
+  if (!this.audioBuffers.has(index)) {
+    console.error('Audio buffer is not loaded for index:', index);
+    return;
+  }
+
+  const audioBuffer = this.audioBuffers.get(index)!;
+  const channelData = audioBuffer.getChannelData(0);
+  const step = Math.ceil(channelData.length / width);
+  const amp = height / 2;
+
+  // Clear canvas
+  canvasCtx.clearRect(0, 0, width, height);
+
+  // Draw the entire waveform in a light color (e.g., gray)
+  canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+  canvasCtx.fillRect(0, 0, width, height);
+  canvasCtx.lineWidth = 2;
+  canvasCtx.strokeStyle = '#39943c';
+  canvasCtx.beginPath();
+
+  for (let i = 0; i < width; i++) {
+    const min = Math.min(...channelData.slice(i * step, (i + 1) * step));
+    const max = Math.max(...channelData.slice(i * step, (i + 1) * step));
+    canvasCtx.moveTo(i, (1 + min) * amp);
+    canvasCtx.lineTo(i, (1 + max) * amp);
+  }
+  canvasCtx.stroke();
+
+  // Calculate playhead position in pixels
+  const playheadX = (playheadPosition / audioBuffer.duration) * width;
+
+  // Draw the played portion in red
+  canvasCtx.strokeStyle = 'red';
+  canvasCtx.beginPath();
+  for (let i = 0; i < playheadX; i++) {
+    const min = Math.min(...channelData.slice(i * step, (i + 1) * step));
+    const max = Math.max(...channelData.slice(i * step, (i + 1) * step));
+    canvasCtx.moveTo(i, (1 + min) * amp);
+    canvasCtx.lineTo(i, (1 + max) * amp);
+  }
+  canvasCtx.stroke();
+
+  // Draw the playhead line in red
+  canvasCtx.strokeStyle = 'red';
+  canvasCtx.lineWidth = 2;
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(playheadX, 0);
+  canvasCtx.lineTo(playheadX, height);
+  canvasCtx.stroke();
+}
